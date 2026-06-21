@@ -38,17 +38,7 @@ _DB_NAME = "uc-105-chatbot.db"
 db_handler = DBHandler(db_path=_DB_DIR, db_name=_DB_NAME, max_memory_turns=MAX_MEMORY_TURNS)
 
 ### Select LLM
-llm = ChatNVIDIA(
-    #model="mistralai/mixtral-8x7b-instruct-v0.1",
-    #model="ibm/granite-3.3-8b-instruct",
-    #model="meta/llama-3.3-70b-instruct",
-    #model="deepseek-ai/deepseek-v3.2",
-    model="meta/llama-3.1-8b-instruct"
-    #model="nvidia/llama-3.1-nemotron-nano-4b-v1.1",
-    #model='openai/gpt-oss-120b',
-    #model='google/gemma-2-27b-it',
-    #model='nvidia/llama-3.3-nemotron-super-49b-v1', # structured output
-)
+llm = ChatNVIDIA(model="meta/llama-3.1-8b-instruct")
 
 graph = get_graph(llm=llm, logger=logger, domains=AUTHORIZED_DOMAINS)
 
