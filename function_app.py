@@ -32,18 +32,21 @@ WINDOW_K = int(os.getenv("CONVERSATION_WINDOW_K", "10"))  # last K messages to k
 MAX_MEMORY_TURNS = int(os.getenv("MAX_MEMORY_TURNS", "100"))  # last K messages to keep
 
 ### Init DB
-_DB_DIR = os.getenv("DB_DIR", ".")
+_DB_DIR = os.getenv("DB_DIR", "/home/data")
 _DB_NAME = "uc-105-chatbot.db"
  
 db_handler = DBHandler(db_path=_DB_DIR, db_name=_DB_NAME, max_memory_turns=MAX_MEMORY_TURNS)
+logger.info("DB handler loaded.")
 
 ### Select LLM
 llm = ChatNVIDIA(
     model="meta/llama-3.1-8b-instruct"
     #model="deepseek-ai/deepseek-v3.2"
     )
+logger.info("LLM client loaded.")
 
 graph = get_graph(llm=llm, logger=logger, domains=AUTHORIZED_DOMAINS)
+logger.info("Init finished.")
 
 @app.route(route="chat", methods=["POST"])
 def chat(req: func.HttpRequest) -> func.HttpResponse:

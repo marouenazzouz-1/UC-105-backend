@@ -10,3 +10,9 @@ authorized-websites:
   - goldcrestlfg.com
   - tilhill.com
   - greshamhouse.com
+azure:
+  subscription-id: 7ca7e973-5a8a-4d34-8724-5b497830a42a
+  resource-group: Church-Commisionners-AI-enablement-UCs
+  storage-account: ccstorageaccount2
+  func-app-name: uc-105-backend
+  region: westeurope

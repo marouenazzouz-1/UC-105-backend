@@ -1,4 +1,5 @@
 import os
+import time
 import sqlite3
 import threading
 from typing import List
@@ -25,7 +26,7 @@ class DBHandler():
                     session_id  TEXT    NOT NULL,
                     role        TEXT    NOT NULL,
                     content     TEXT    NOT NULL,
-                    created_at  REAL    NOT NULL DEFAULT (unixepoch('now', 'subsec'))
+                    created_at  REAL    NOT NULL DEFAULT (strftime('%s','now'))
                 )
             """)
             conn.execute(
@@ -64,8 +65,8 @@ class DBHandler():
             for msg in messages:
                 role = "human" if isinstance(msg, HumanMessage) else "ai"
                 conn.execute(
-                    "INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)",
-                    (session_id, role, msg.content),
+                    "INSERT INTO messages (session_id, role, content, created_at) VALUES (?, ?, ?, ?)",
+                    (session_id, role, msg.content, time.time()),
                 )
             # Keep only the MAX_MEMORY_TURNS most recent rows per session
             conn.execute(
