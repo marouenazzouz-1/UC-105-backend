@@ -32,21 +32,33 @@ WINDOW_K = int(os.getenv("CONVERSATION_WINDOW_K", "10"))  # last K messages to k
 MAX_MEMORY_TURNS = int(os.getenv("MAX_MEMORY_TURNS", "100"))  # last K messages to keep
 
 ### Init DB
-_DB_DIR = os.getenv("DB_DIR", "/home/data")
-_DB_NAME = "uc-105-chatbot.db"
- 
-db_handler = DBHandler(db_path=_DB_DIR, db_name=_DB_NAME, max_memory_turns=MAX_MEMORY_TURNS)
-logger.info("DB handler loaded.")
+DB_BACKEND = os.environ.get("DB_BACKEND", "sqlite").lower()
+_DB_DIR = os.getenv("DB_DIR", ".")
+_DB_NAME = os.getenv("DB_NAME", "uc-105-chatbot.db")
+
+# Basic validation & logging for chosen backend
+if DB_BACKEND == "mssql":
+    logger.info("Using MSSQL backend (DB_BACKEND=mssql)")
+    if not (os.environ.get("SQL_SERVER_CONN") or os.environ.get("SQL_SERVER_PWD")):
+        logger.error(
+            "MSSQL selected but neither SQL_SERVER_CONN nor SQL_SERVER_PWD is set in the environment"
+        )
+else:
+    logger.info("Using SQLite backend (DB_BACKEND=sqlite)")
+
+try:
+    db_handler = DBHandler(db_path=_DB_DIR, db_name=_DB_NAME, max_memory_turns=MAX_MEMORY_TURNS)
+except Exception as exc:
+    logger.exception("Failed to initialize DBHandler: %s", exc)
+    raise
 
 ### Select LLM
 llm = ChatNVIDIA(
     model="meta/llama-3.1-8b-instruct"
     #model="deepseek-ai/deepseek-v3.2"
     )
-logger.info("LLM client loaded.")
 
 graph = get_graph(llm=llm, logger=logger, domains=AUTHORIZED_DOMAINS)
-logger.info("Init finished.")
 
 @app.route(route="chat", methods=["POST"])
 def chat(req: func.HttpRequest) -> func.HttpResponse:

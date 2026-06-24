@@ -42,9 +42,12 @@ Conversation history is persisted to a local SQLite database via `DBHandler`. A 
 - [Azure Functions Core Tools v4](https://learn.microsoft.com/azure/azure-functions/functions-run-local)
 - API keys for NVIDIA NIM (LLM) and Tavily (search)
 ### Setup
- 
+
 ```bash
-pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip setuptools wheel
+python3 -m pip install -r requirements.txt
 ```
  
 ### Start the Function App
@@ -79,6 +82,15 @@ curl -X POST http://localhost:7071/api/chat \
 }
 ```
  
+```bash
+curl -X GET http://localhost:7071/api/session/test-123/history
+```
+
+
+```bash
+curl -X DELETE http://localhost:7071/api/session/test-123
+```
+  
 ---
  
 ## Environment variables
@@ -90,7 +102,7 @@ curl -X POST http://localhost:7071/api/chat \
 | `CONVERSATION_WINDOW_K` | `10` | Number of recent messages sent to the LLM |
 | `MAX_MEMORY_TURNS` | `100` | Maximum messages retained in the DB per session |
 | `DB_DIR` | `.` | Directory where the SQLite file is written |
- 
+| `DB_BACKEND` | `mssql` | Choose Sql Server as backend|
 ---
  
 ## TODO — Azure deployment
@@ -149,6 +161,8 @@ az functionapp config appsettings set \
  
 - [ ] Decide whether to store secrets in **Azure Key Vault** and reference them via Key Vault references instead of plain app settings
 - [ ] Set `DB_DIR` to a writable path, or replace SQLite with **Azure Table Storage** / **Azure Cosmos DB** for durability across cold starts and scale-out
+- Add `.venv` to your local `.gitignore` to avoid committing the virtual environment.
+
 ### 6. CORS
  
 ```bash
