@@ -26,12 +26,12 @@ class GlobalState(BaseModel):
     search_was_used: bool = Field(default=False)
     query_result: Optional[AIMessage] = Field(default=None)
 
-tavily_search = TavilySearch(max_results=3)
+tavily_search = TavilySearch(max_results=7)
 
 @tool
 def get_search_results(query: str) -> str:
     """Runs a web search given a user input requiring updated information or specifying to use internet."""
-    return tavily_search.invoke({"query": query})
+    return tavily_search.invoke(query)
 
 def get_search_node(llm: BaseChatModel, sys_message: str, logger: logging.Logger, domains: List[str]):
     """
@@ -76,7 +76,7 @@ def get_search_node(llm: BaseChatModel, sys_message: str, logger: logging.Logger
             if call["name"] == "get_search_results":
                 logger.info(f"Calling get_search_results with args: {call['args']}", )
                 result = get_search_results.invoke(call["args"])
-                logger.info(result)
+                logger.info(f"search results {result}")
                 web_search_result = _parse_search_results(result)
  
         logger.info(f"Search results fetched: {web_search_result.model_dump_json()}")
