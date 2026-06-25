@@ -10,6 +10,8 @@ import sys
 import yaml
 import azure.functions as func
 from langchain_nvidia import ChatNVIDIA
+from langchain_openai import AzureChatOpenAI
+
 from langchain_core.messages import AIMessage, HumanMessage
 
 from src.db import DBHandler
@@ -39,10 +41,31 @@ db_handler = DBHandler(db_path=_DB_DIR, db_name=_DB_NAME, max_memory_turns=MAX_M
 logger.info("DB handler loaded.")
 
 ### Select LLM
-llm = ChatNVIDIA(
-    model="meta/llama-3.1-8b-instruct"
-    #model="deepseek-ai/deepseek-v3.2"
+#llm = ChatNVIDIA(
+#    model="meta/llama-3.1-8b-instruct"
+#    #model="deepseek-ai/deepseek-v3.2"
+#    )
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY", '')
+
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "")
+DEPLOYMENT = os.getenv("DEPLOYMENT", "")
+API_VERSION = os.getenv("API_VERSION", "")
+
+if DEPLOYMENT and API_VERSION and AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT:
+    llm = AzureChatOpenAI(
+        azure_deployment=DEPLOYMENT,
+        api_version=API_VERSION,
+        api_key=AZURE_OPENAI_API_KEY,
+        # temperature=0,
+        azure_endpoint=AZURE_OPENAI_ENDPOINT
     )
+else:
+    llm = ChatNVIDIA(
+        model="meta/llama-3.1-8b-instruct"
+        #model="deepseek-ai/deepseek-v3.2"
+        )
+    logger.warning('Backup LLM selected, Check AZURE_OPENAI credentials!')
+
 logger.info("LLM client loaded.")
 
 graph = get_graph(llm=llm, logger=logger, domains=AUTHORIZED_DOMAINS)
