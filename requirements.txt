@@ -7,3 +7,4 @@ PyYAML==6.0.3
 Requests==2.34.2
 azure-functions
 langchain-nvidia-ai-endpoints==1.0.0
+langchain-openai
